@@ -31,5 +31,5 @@ package object syntax {
   def at(t: ZonedDateTime): Query                          = At(t)
   def between(t1: ZonedDateTime, t2: ZonedDateTime): Query = Between(t1, t2)
   def all: Query                                           = All()
-  def nothing: Query                                       = Nothing()
+  def empty: Query                                         = Empty()
 }

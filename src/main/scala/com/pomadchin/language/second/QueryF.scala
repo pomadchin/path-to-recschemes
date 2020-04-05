@@ -27,7 +27,6 @@ import jp.ne.opt.chronoscala.Imports._
 
 import java.time.ZonedDateTime
 
-/** The type is often called a "pattern functor". */
 @JsonCodec sealed trait QueryF[A]
 @JsonCodec case class And[A](l: A, r: A) extends QueryF[A]
 @JsonCodec case class Or[A](l: A, r: A) extends QueryF[A]
@@ -37,7 +36,7 @@ import java.time.ZonedDateTime
 @JsonCodec case class At[A](t: ZonedDateTime) extends QueryF[A]
 @JsonCodec case class Between[A](t1: ZonedDateTime, t2: ZonedDateTime) extends QueryF[A]
 @JsonCodec case class All[A]() extends QueryF[A]
-@JsonCodec case class Nothing[A]() extends QueryF[A]
+@JsonCodec case class Empty[A]() extends QueryF[A]
 
 /** Fix is used to help Scala compiler to derive an expression type. */
 case class Fix[F[_]](unfix: F[Fix[F]])
@@ -74,7 +73,7 @@ object QueryF {
       case Covers(v)     => Covers[B](v)
       case At(v)         => At[B](v)
       case Between(f, t) => Between[B](f, t)
-      case Nothing()     => Nothing[B]()
+      case Empty()       => Empty[B]()
       case All()         => All[B]()
     }
   }
@@ -87,7 +86,7 @@ object QueryF {
     case At(t)           => s"(at $t)"
     case Between(t1, t2) => s"(between ($t1 & $t2))"
     case All()           => "(all)"
-    case Nothing()       => "(nothing)"
+    case Empty()         => "(empty)"
     case And(e1, e2)     => s"($e1 and $e2)"
     case Or(e1, e2)      => s"($e1 or $e2)"
   }
@@ -100,7 +99,7 @@ object QueryF {
     case At(t)           => _.filter(_.metadata.time.contains(t))
     case Between(t1, t2) => _.filter(_.metadata.time.fold(false) { current => t1 <= current && current < t2 })
     case All()           => identity
-    case Nothing()       => _ => Nil
+    case Empty()         => _ => Nil
     case And(e1, e2)     => list => val left = e1(list); e2(left)
     case Or(e1, e2)      => list => e1(list) ++ e2(list)
   }
@@ -109,16 +108,16 @@ object QueryF {
   val algebraJson: Algebra[QueryF, Json] = _.asJson
 
   val unfolder: Json.Folder[QueryF[Json]] = new Json.Folder[QueryF[Json]] {
-    def onNull: QueryF[Json]                       = Nothing()
-    def onBoolean(value: Boolean): QueryF[Json]    = Nothing()
-    def onNumber(value: JsonNumber): QueryF[Json]  = Nothing()
-    def onString(value: String): QueryF[Json]      = Nothing()
-    def onArray(value: Vector[Json]): QueryF[Json] = Nothing()
+    def onNull: QueryF[Json]                       = Empty()
+    def onBoolean(value: Boolean): QueryF[Json]    = Empty()
+    def onNumber(value: JsonNumber): QueryF[Json]  = Empty()
+    def onString(value: String): QueryF[Json]      = Empty()
+    def onArray(value: Vector[Json]): QueryF[Json] = Empty()
     def onObject(value: JsonObject): QueryF[Json]  =
       value
         .asJson
         .as[QueryF[Json]]
-        .getOrElse(Nothing[Json]())
+        .getOrElse(Empty[Json]())
   }
 
   /** Unfolding JSON into a Query expression */

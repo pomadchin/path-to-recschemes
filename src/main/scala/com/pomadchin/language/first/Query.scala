@@ -32,7 +32,7 @@ import java.time.ZonedDateTime
 @JsonCodec case class At(t: ZonedDateTime) extends Query
 @JsonCodec case class Between(t1: ZonedDateTime, t2: ZonedDateTime) extends Query
 @JsonCodec case class All() extends Query
-@JsonCodec case class Nothing() extends Query
+@JsonCodec case class Empty() extends Query
 
 object Query {
   def evalString(e: Query): String =
@@ -43,7 +43,7 @@ object Query {
       case At(t)           => s"(at $t)"
       case Between(t1, t2) => s"(between ($t1 & $t2))"
       case All()           => "(all)"
-      case Nothing()       => "(nothing)"
+      case Empty()       => "(empty)"
       case And(e1, e2)     => s"(${evalString(e1)} and ${evalString(e2)})"
       case Or(e1, e2)      => s"(${evalString(e1)} or ${evalString(e2)})"
     }
@@ -56,7 +56,7 @@ object Query {
       case At(t)           => _.filter(_.metadata.time.contains(t))
       case Between(t1, t2) => _.filter(_.metadata.time.fold(false) { current => t1 <= current && current < t2 })
       case All()           => identity
-      case Nothing()       => _ => Nil
+      case Empty()       => _ => Nil
       case And(e1, e2)     => list => val left = evalList(e1)(list); evalList(e2)(left)
       case Or(e1, e2)      => list => evalList(e1)(list) ++ evalList(e2)(list)
     }
