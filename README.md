@@ -1,4 +1,4 @@
-# Code for the Recursion Schemes from Scratch talk
+# Code for the "A path to Recursion Schemes" talk
 
 This repository contains the code that was implemented for the [path-to-recschemes.pomadchin.com](http://path-to-recschemes.pomadchin.com/) talk.
 
