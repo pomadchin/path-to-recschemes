@@ -1,6 +1,6 @@
 # Code for the "A path to Recursion Schemes" talk
 
-This repository contains the code that was implemented for the [path-to-recschemes.pomadchin.com](http://path-to-recschemes.pomadchin.com/) talk.
+This repository contains the code that was implemented for the [path-to-recschemes.pomadchin.com](https://path-to-recschemes.pomadchin.com/) talk.
 
 During this talk we're going from a straightforward and the most obvious 
 DSL implementation towards abstracting over the recursion, to the recursion schemes usage. 
